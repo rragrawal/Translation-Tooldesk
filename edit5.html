@@ -1,0 +1,62 @@
+{{extend 'layout.html'}}
+    <h4>Edit wiki page</h4>
+{{=form1}}
+<span align="left" style="font-weight:bold;" >Do you mean:</span>
+<select name="Suggestions" id="Suggestions">
+  <option value="">----</option>
+</select>
+<!-- {{=form2}}  -->
+<script type="text/javascript">
+var textComponent = document.getElementById('page_body');
+function ShowSelection()
+{
+  var selectedText;
+  // IE version
+  if (document.selection != undefined)
+  {
+    textComponent.focus();
+    var sel = document.selection.createRange();
+    selectedText = sel.text;
+  }
+  // Mozilla version
+  else if (textComponent.selectionStart != undefined)
+  {
+    var startPos = textComponent.selectionStart;
+    var endPos = textComponent.selectionEnd;
+    selectedText = textComponent.value.substring(startPos, endPos)
+  }
+    if(selectedText.length > 0)
+    {
+    var x = new XMLHttpRequest();
+x.open("GET","https://translationtooldesk.pythonanywhere.com/tooldesk/static/dict1",false);
+x.send();
+myTextFile=x.responseText;
+  arrayOfLines = myTextFile.match(/[^\r\n]+/g);
+        for(i=0; i<arrayOfLines.length; i++) {
+            var1 = arrayOfLines[i].split(" : ")[0];
+            if(selectedText == var1)
+            {
+                var mySelect = document.getElementById("Suggestions");
+                while (mySelect.firstChild) {
+                    mySelect.removeChild(mySelect.firstChild);
+                }
+                arrayOfSuggestions = arrayOfLines[i].split(" : ")[1].split(",");
+                for(j=0;j<arrayOfSuggestions.length;j++) {
+                    var option = document.createElement("option");
+                    option.text = arrayOfSuggestions[j];
+                    mySelect.add(option);
+                }
+               // alert("Possible translations : " + arrayOfLines[i].split(" : ")[1]);
+            }
+
+        }
+
+}
+}
+    document.onmouseup = function (e) {
+        if (document.activeElement == textComponent) {
+        ShowSelection();
+        }
+    }
+</script>
+
